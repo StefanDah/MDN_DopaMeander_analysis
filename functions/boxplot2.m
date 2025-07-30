@@ -1,3 +1,10 @@
+% Source: https://github.com/kakearney/boxplot2-pkg
+% Author:  Kelly Kearney
+% Title: boxplot2
+% License: MIT
+
+
+
 function h = boxplot2(varargin)
 %BOXPLOT2 Enhanced boxplot plots
 % 
