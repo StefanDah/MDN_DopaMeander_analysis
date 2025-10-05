@@ -1,0 +1,17 @@
+# Ignore data and plot outputs
+data/
+plots/
+
+# Ignore temporary and backup files
+*.asv
+*.fig
+*.tmp
+*.bak
+
+# Ignore MATLAB autosave files
+*.m~
+*.mlx~
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
