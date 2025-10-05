@@ -1,22 +1,33 @@
 %% Load data and set file paths
 
 % Find current path and load data
-script_path = fileparts(matlab.desktop.editor.getActiveFilename);  % only works if file is saved
+scriptPath = fileparts(matlab.desktop.editor.getActiveFilename);  % only works if file is saved
+rootPath = fileparts(scriptPath);
 
-load('data/post_walking_Imposter.mat')
+dataFile = fullfile(rootPath, 'data/MDN_walking_activity_correlation', 'post_walking_Imposter.mat');
 
-script_path = fileparts(matlab.desktop.editor.getActiveFilename);  % only works if file is saved
+if ~exist(dataFile, 'file')
+    error('Data file not found: %s', dataFile);
+end
 
-% Then define subfolder
-saveFolder = fullfile(fileparts(script_path), 'plots');
-if ~exist(saveFolder, 'dir')
-    mkdir(saveFolder);
+load(dataFile)
+
+% Define plots folder
+plotsFolder = fullfile(rootPath, 'plots/MDN_walking_activity_correlation');
+
+% Check if the folder exists; if not, create it
+if ~exist(plotsFolder, 'dir')
+    mkdir(plotsFolder);
 end
 
 %% Set analysis parameters
 smoothing_factor = 2;
 sampling_rate = 20000;
 binsize_factor = 0.25;
+
+
+savePlots = input('Do you want to save the plots? Y/N [Y]: ', 's');
+savePlotsFlag = strcmpi(savePlots, 'Y');  % true if 'Y' or 'y'
 
 %%
 
@@ -51,7 +62,7 @@ analysis = analysis(~cellfun(@(x) x > -27,{analysis.medianVM}));
 analysis = analysis(~cellfun(@(x)x < 6,{analysis.meanSpikeAmp}));
 
 %Concatenate analysis and group side of recording (if neseccary)
-analysis = concatenate_analysis(analysis);
+analysis = concatenate_analysis_unilateral(analysis);
 
 %% Plot overviews if necessary
 
@@ -104,12 +115,14 @@ plot(lagsInSec ,meanxCorrSpikesXveloc, 'm', 'LineWidth', 3)
 title(' mean spikerate-Xz score')
 ylim([-0.6 0.6])
 
-% print('-dpdf', '-painters', 'corsscorrelationX__zscore_with_mean.pdf');
-
-% print(['corsscorrelationX_zscore_with_mean' '.eps'], '-depsc2', '-tiff', '-r300')
-% print(['corsscorrelationX_zscore_with_mean' '.png'], '-dpng','-r300')
-
-
+if savePlotsFlag
+    filename = 'corsscorrelationX_zscore_with_mean';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end
 
 figure
 for k = 1 : length(analysis)
@@ -127,63 +140,55 @@ meanxCorrSpikesXveloc = median(spikesXveloc);
 plot(lagsInSec ,meanxCorrSpikesXveloc, 'm', 'LineWidth', 3)
 title(' median spikerate-Xz score')
 ylim([-0.6 0.6])
-% print(['corsscorrelationX__zscore_with_median' '.eps'], '-depsc2', '-tiff', '-r300')
-% print(['corsscorrelationX__zscore_with_median' '.png'], '-dpng','-r300')
+
+if savePlotsFlag
+    filename = 'corsscorrelationX__zscore_with_median';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end
+
 %% Cross correlation Z vs Firing rate
 clearvars spikesZveloc lags right_cell left_cell plothandle
 
 figure
 for k = 1: length(analysis)
 
-    if strcmp(analysis(k).Side, "right")
-        color = 'k';
-    else color = 'm';
-    end
     [spikesZveloc(k,:), lags] = xcorr(zscore((analysis(k).spikesbinned)),...
         zscore((analysis(k).zveloc_in_mm_binned)), 8 ...
         , 'coeff');
     
-    plothandle{k} = plot(lags/(1/binsize_factor), spikesZveloc(k,:), color);
+    plothandle{k} = plot(lags/(1/binsize_factor), spikesZveloc(k,:));
     
     hold on
 
 end
 
-mean_right = [];
-mean_left = [];
-
-for i = 1 : length(analysis)
-    if strcmp(analysis(i).Side, "right")
-        mean_right(i,:) = spikesZveloc(i,:);
-    else
-        mean_left(i,:) = spikesZveloc(i,:);
-    end
-end
-
-mean_left(all(mean_left == 0, 2), :) = [];
-mean_right(all(mean_right == 0, 2), :) = [];
 
 lagsInSec = lags/(1/binsize_factor);
 meanxCorrSpikesZveloc = mean(spikesZveloc);
-plot(lagsInSec ,median(mean_left), 'm', 'LineWidth', 3)
 hold on
-plot(lagsInSec ,median(mean_right), 'k', 'LineWidth', 3)
+% plot(lagsInSec ,meanxCorrSpikesZveloc, 'k', 'LineWidth', 3)
 
-title('median  spikerate-Z zscore')
-ylim([-0.4 0.4])
+title('mean MDN spikerate-Z zscore')
+ylim([-0.6 0.6])
 xlabel('Time (s)')
 ylabel('Correlation coefficient')
 
-legend('Left', 'Right')
-%
-% print(['corsscorrelationZ__zscore_with_median' '.eps'], '-depsc2', '-tiff', '-r300')
-% print(['corsscorrelationZ__zscore_with_median' '.png'], '-dpng','-r300')
+if savePlotsFlag
+    filename = 'corsscorrelationZ__zscore_with_median';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end
 
 clearvars spikesZveloc lags right_cell left_cell plothandle
-
-
-
 clearvars spikesZveloc lags right_cell left_cell
+
 
 figure
 for k = 1 : length(analysis)
@@ -199,14 +204,20 @@ for k = 1 : length(analysis)
 end
 
 lagsInSec = lags/(1/binsize_factor);
-meanxCorrSpikesZveloc = median(spikesZveloc);
+meanxCorrSpikesZveloc = mean(spikesZveloc);
 
 plot(lagsInSec ,meanxCorrSpikesZveloc, 'm', 'LineWidth', 3)
-title('median  spikerate-abs(Z) zscore')
-ylim([-0.3 0.6])
+title('mean MDN spikerate-abs(Z) zscore')
+ylim([-0.6 0.6])
 
-% print(['corsscorrelationZ__abs_zscore_with_median' '.eps'], '-depsc2', '-tiff', '-r300')
-% print(['corsscorrelationZ__abs_zscore_with_median' '.png'], '-dpng','-r300')
+if savePlotsFlag
+    filename = 'corsscorrelationZ__abs_zscore_with_median';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end
 
 %% Pool spike frequency and velocites across all
 
@@ -310,9 +321,6 @@ end
 % % 
 % % end
 %% Plot pooled data
-
-
-
 figure
 boxplot(xvelocbinned_all_mm(:), spikesbinned_all(:), 'symbol', '','whisker', 0)
 yline(0, 'k--')
@@ -452,10 +460,16 @@ percentiles_MDN = percentiles;
 
 ylabel('Forward Velocity (mm/s)')
 xlabel('norm. Firing Rate')
-title('', 'Normalied Firing Rate vs Forward Velocity in mm/s')
+title('', 'Normalized Firing Rate vs Forward Velocity in mm/s')
 
-% print('-dpdf', '-painters', '_normalized_spike_rate_forward_velocity.pdf');
-
+if savePlotsFlag
+    filename = 'normalized_spike_rate_forward_velocity';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end
 %% Find all Z velocity values for every spike frequency OVERALL
 
 clearvars matchingValues indices plot_y_median plot_y zVelocitySortedtoFreq
@@ -556,12 +570,19 @@ title('', 'Normalied Firing Rate vs Z Velocity in °/s')
 % print(['_normalized_spike_rate_angular_velocity' '.png'], '-dpng','-r300', '-vector')
 % print('-dpdf', '-painters', '_normalized_spike_rate_angular_velocity.pdf');
 
-
+if savePlotsFlag
+    filename = 'normalized_spike_rate_angular_velocity';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end
 %% Moving cross correlation --------- Z Velocity
 clearvars coeff lags mean_coeff coeff_temp data_vm data_xvelo mean_per_cell_coeff
 
 %Size of the window for moving cross correlation in second
-moving_window = 2*sampling_rate;
+moving_window = 10*sampling_rate;
 moving_window_in_s = moving_window/sampling_rate;
 
 figure
@@ -648,8 +669,8 @@ for i = 1 : n
     end
 end
 
-mean_coeff_right = mean(temp_mean_coeff_right,2);
-mean_coeff_left = mean(temp_mean_coeff_left,2);
+mean_coeff_right = median(temp_mean_coeff_right,2);
+mean_coeff_left = median(temp_mean_coeff_left,2);
 
 plot(lags/sampling_rate, mean_coeff_right, 'k', 'LineWidth', 3)
 hold on
@@ -660,9 +681,14 @@ plot(lags/sampling_rate, mean_coeff_left, 'k', 'LineWidth', 3)
 
 % print('-dpdf', '-painters', 'crosscorr__VM_Z.pdf');
 
-print(['2s_window_mean_crosscorr__VM_Z' '.eps'], '-depsc2', '-tiff', '-r300')
-print(['2s_window_mean_crosscorr__VM_Z' '.png'], '-dpng','-r300')
-
+if savePlotsFlag
+    filename = 'median_crosscorr__VM_Z';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end
 %% Moving cross correlation --------- absolute Z Velocity
 clearvars coeff lags mean_coeff coeff_temp data_vm data_xvelo mean_per_cell_coeff
 
@@ -740,11 +766,14 @@ ylabel("Correlation coefficient")
 maxCoeff = lags(Idx)/sampling_rate;
 % text(-1.5, 0.25, ['max coeff at = ' num2str(maxCoeff) ' s'])
 
-% print('-dpdf', '-painters', 'crosscorr__VM_absZ.pdf');
-
-% print(['median_crosscorr__VM_absZ' '.eps'], '-depsc2', '-tiff', '-r300')
-% print(['median_crosscorr__VM_absZ' '.png'], '-dpng','-r300')
-
+if savePlotsFlag
+    filename = 'median_crosscorr__VM_absZ';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end
 %% Moving cross correlation --------- X Velocity
 clearvars coeff lags mean_coeff coeff_temp data_vm data_xvelo mean_per_cell_coeff
 
@@ -822,6 +851,11 @@ ylabel("Correlation coefficient")
 maxCoeff = lags(Idx)/sampling_rate;
 % text(-1.5, 0.25, ['max coeff at = ' num2str(maxCoeff) ' s'])
 
-% print('-dpdf', '-painters', 'crosscorr__VM_X.pdf');
-% print(['median_crosscorr__VM_X' '.eps'], '-depsc2', '-tiff', '-r300')
-% print(['median_crosscorr__VM_X' '.png'], '-dpng','-r300')
+if savePlotsFlag
+    filename = 'median_crosscorr__VM_X';
+    % Full paths for different formats
+    fullPathEPS = fullfile(plotsFolder, [filename, '.eps']);
+    fullPathPNG = fullfile(plotsFolder, [filename, '.png']);
+    print(fullPathEPS, '-depsc2', '-tiff', '-r300');
+    print(fullPathPNG, '-dpng', '-r300');
+end

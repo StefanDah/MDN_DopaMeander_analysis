@@ -19,7 +19,7 @@ nr_spikes_avg = 300;
 
 %% Load data from flysheet 'Fly_ID'
 
-[Date, FlyNumber, TrialNumber, CellNumber] = fcn_Excelimport('C:\Users\stefa\Documents\MATLAB\DNSpeedoVis\DNSpeedoVis\vertical cw\Fly_ID.xlsx', 'Sheet1', [1,99]);
+[Date, FlyNumber, TrialNumber, CellNumber] = fcn_Excelimport('filepath_placeholder\Fly_ID.xlsx', 'Sheet1', [1,99]);
 
 %Shorten These Variables in case empty values need to be excluded
 Date(find(isnan(TrialNumber)==1)) = [];
@@ -163,6 +163,6 @@ for fly = 1:length(files)
 end
 
 %%
-%save('pre_vertical_cw','analysis','-v7.3');
+%save('pre_processing','analysis','-v7.3');
 
 
