@@ -1,17 +1,34 @@
-%% Load data
+%% Load data and set file paths
 
-load('\postAnalysis.mat')
+%Find current path and load data
+scriptPath = fileparts(matlab.desktop.editor.getActiveFilename);  % only works if file is saved
+rootPath = fileparts(scriptPath);
 
-filepath='placeholder';
+dataFile = fullfile(rootPath, 'data/placeholder', 'placeholder.mat');
+
+if ~exist(dataFile, 'file')
+    error('Data file not found: %s', dataFile);
+end
+
+load(dataFile)
+
+% Define plots folder
+plotsFolder = fullfile(rootPath, 'plots/placeholder');
+
+% Check if the folder exists; if not, create it
+if ~exist(plotsFolder, 'dir')
+    mkdir(plotsFolder);
+end
+%% Set analysis parameters
 
 smoothing_factor = 2;
-
 sampling_rate = 20000;
-data_reduction_for_plotting = 400;
+
 binsize_factor = 0.2; %200 ms
 numPokes = 10;
 %t_ramp = 0.5; % 0.5s ramp time
 t_poke = 2; % 2s poke hold
+
 interstim_interval = 10; %10s between pokes
 % Length of analysis window
 windowSizeinS = 0.5;
@@ -24,6 +41,7 @@ bin = 20;
 for k = 1 : length(analysis)
     analysis(k).xveloc_in_mm = analysis(k).VelocX(:,1)*8.79;
     analysis(k).zveloc_in_degree_per_s = analysis(k).VelocZ(:,1)*158.9;
+    analysis(k).zveloc_in_mm = analysis(k).VelocZ(:,1)*8.79;
     analysis(k).VM_medfilt = medfilt1(analysis(k).VM,1000);
 end
 
@@ -206,9 +224,6 @@ for k = 1 : length(analysis)
 end
 
 %% Z velocity binning during stimulation window
-for k = 1 : length(analysis)
-    analysis(k).zveloc_in_mm = analysis(k).VelocZ(:,1)*8.79;
-end
 
 %%%%% Right Antenna
 clearvars binstart binstarts binsize

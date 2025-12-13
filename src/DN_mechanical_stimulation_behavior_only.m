@@ -1,20 +1,44 @@
-%% Load data
+%% Load data and set file paths
 
-load('\prePoker_behavior.mat')
+%Find current path and load data
+scriptPath = fileparts(matlab.desktop.editor.getActiveFilename);  % only works if file is saved
+rootPath = fileparts(scriptPath);
 
-filepath='\behavior_only';
+dataFile = fullfile(rootPath, 'data/placeholder', 'placeholder.mat');
+
+if ~exist(dataFile, 'file')
+    error('Data file not found: %s', dataFile);
+end
+
+load(dataFile)
+
+% Define plots folder
+plotsFolder = fullfile(rootPath, 'plots/placeholder');
+
+% Check if the folder exists; if not, create it
+if ~exist(plotsFolder, 'dir')
+    mkdir(plotsFolder);
+end
+
+%% Set analysis parameters
 
 smoothing_factor = 2;
 sampling_rate = 20000;
-data_reduction_for_plotting = 400;
-binsize_factor = 0.2; %200 ms
-numPokes = 10;
-%t_ramp = 0.5; % 0.5s ramp time
+binsize_factor = 0.2;
+num_Pokes = 10;
 t_poke = 2; % 2s poke hold
 interstim_interval = 10; %10s between pokes
 
-binsize = 4000;
-bin = 20;
+savePlots = input('Do you want to save the plots? Y/N [Y]: ', 's');
+savePlotsFlag = strcmpi(savePlots, 'Y');  % true if 'Y' or 'y'
+
+
+%%
+for k = 1 : length(analysis)
+    analysis(k).xveloc_in_mm = analysis(k).VelocX(:,1)*8.79;
+    analysis(k).zveloc_in_mm = analysis(k).VelocZ(:,1)*8.79;
+
+end
 
 %% trajectory
 
@@ -78,9 +102,7 @@ mean_velocity = d_tot/((length(currentMotion)*400)/sampling_rate); %%mean veloci
 
 
 %% X velocity binning during stimulation window
-for k = 1 : length(analysis)
-    analysis(k).xveloc_in_mm = analysis(k).VelocX(:,1)*8.79;
-end
+
 %%%%% Right Antenna
 clearvars binstart binstarts binsize binned_xveloc_right
 
@@ -93,7 +115,7 @@ for k = 1 : length(analysis)
 
     temp_xveloc = [];
 
-    for m = 1 : numPokes
+    for m = 1 : num_Pokes
         window_on = analysis(k).trigger_on(m)-1*sampling_rate; %1s before poking
         window_off = analysis(k).trigger_off(m)+1*sampling_rate; %1s after poking
 
@@ -110,10 +132,6 @@ end
 
 %% Z velocity preliminary
 
-for k = 1 : length(analysis)
-    analysis(k).zveloc_in_mm = analysis(k).VelocZ(:,1)*8.79;
-end
-
 %%%%% Right Antenna
 clearvars binstart binstarts binsize
 
@@ -126,7 +144,7 @@ for k = 1 : length(analysis)
 
     temp_zveloc = [];
 
-    for m = 1 : numPokes
+    for m = 1 : num_Pokes
         window_on = analysis(k).trigger_on(m)-1*sampling_rate; %1s before poking
         window_off = analysis(k).trigger_off(m)+1*sampling_rate; %1s after poking
 
@@ -171,13 +189,13 @@ right_antenna_kir = right_antenna_kir(~cellfun(@isempty,{right_antenna_kir.Veloc
 left_antenna_kir = left_antenna_kir(~cellfun(@isempty,{left_antenna_kir.VelocX}));
 
 % 
-save('postPoker_right_control_all','right_antenna_control','-v7.3');
-save('postPoker_left_control_all','left_antenna_control','-v7.3');
-
-save('postPoker_right_kir_all','right_antenna_kir','-v7.3');
-save('postPoker_left_kir_all','left_antenna_kir','-v7.3');
-
-save('postAnalysis', 'analysis', '-v7.3');
+% save('postPoker_right_control_all','right_antenna_control','-v7.3');
+% save('postPoker_left_control_all','left_antenna_control','-v7.3');
+% 
+% save('postPoker_right_kir_all','right_antenna_kir','-v7.3');
+% save('postPoker_left_kir_all','left_antenna_kir','-v7.3');
+% 
+% save('postAnalysis', 'analysis', '-v7.3');
 
 
 %% Quality control
@@ -652,7 +670,7 @@ window_size = 0.25;
 
 for i = 1 : length(left_antenna_control)
 
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
 
         %Window for analyzing firing rate, x and z velocity, 1 sec
         window_on = left_antenna_control(i).trigger_on(k);
@@ -668,7 +686,7 @@ end
 
 for i = 1 : length(right_antenna_control)
 
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
 
         %Window for analyzing firing rate, x and z velocity, 1 sec
         window_on = right_antenna_control(i).trigger_on(k);
@@ -791,7 +809,7 @@ window_size = 1;
 
 for i = 1 : length(left_antenna_kir)
 
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
 
         %Window for analyzing firing rate, x and z velocity, 1 sec
         window_on = left_antenna_kir(i).trigger_on(k);
@@ -807,7 +825,7 @@ end
 
 for i = 1 : length(right_antenna_kir)
 
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
 
         %Window for analyzing firing rate, x and z velocity, 1 sec
         window_on = right_antenna_kir(i).trigger_on(k);
@@ -925,7 +943,7 @@ analysis_window_size = 0.5;
 
 
 for i = 1 : length(right_antenna_control)
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
         windowOnRight = right_antenna_control(i).trigger_on(k);
         windowOffRight = right_antenna_control(i).trigger_off(k);
         windowOnLeft = left_antenna_control(i).trigger_on(k);
@@ -1025,7 +1043,7 @@ analysis_window_size = 0.5;
 
 
 for i = 1 : length(right_antenna_control)
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
         windowOnRight = right_antenna_control(i).trigger_on(k);
         windowOffRight = right_antenna_control(i).trigger_off(k);
         windowOnLeft = left_antenna_control(i).trigger_on(k);
@@ -1124,7 +1142,7 @@ clearvars xVelocityPrePokeRight xVelocityPrePokeLeft xVelocityDuringPokeRight...
 analysis_window_size = 0.5;
 
 for i = 1 : length(right_antenna_kir)
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
         windowOnRight = right_antenna_kir(i).trigger_on(k);
         windowOffRight = right_antenna_kir(i).trigger_off(k);
         windowOnLeft = left_antenna_kir(i).trigger_on(k);
@@ -1225,7 +1243,7 @@ clearvars xVelocityPrePokeRight xVelocityPrePokeLeft xVelocityDuringPokeRight...
 analysis_window_size = 0.5;
 
 for i = 1 : length(right_antenna_kir)
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
         windowOnRight = right_antenna_kir(i).trigger_on(k);
         windowOffRight = right_antenna_kir(i).trigger_off(k);
         windowOnLeft = left_antenna_kir(i).trigger_on(k);
@@ -1590,7 +1608,7 @@ windowBeforeInSec = 1;
 walkingThreshold = 10;
 
 for i = 1 : length(right_antenna_control)
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
         windowOffRight = right_antenna_control(i).trigger_on(k);
         windowOnRight = right_antenna_control(i).trigger_on(k)-...
             (sampling_rate*windowBeforeInSec);
@@ -1626,7 +1644,7 @@ clearvars medianXVelocitybefore XVelocitybefore meanXVelocitybefore...
     logicalMask
 
 for i = 1 : length(left_antenna_control)
-    for k = 1 : numPokes
+    for k = 1 : num_Pokes
         windowOffLeft = left_antenna_control(i).trigger_on(k);
         windowOnLeft = left_antenna_control(i).trigger_on(k)-...
             (sampling_rate*windowBeforeInSec);
