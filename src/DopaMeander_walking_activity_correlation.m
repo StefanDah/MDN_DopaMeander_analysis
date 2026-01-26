@@ -1,3 +1,21 @@
+%% DopaMeander and MDN differentially contribute to backward walking, forward walking, and turning.
+
+% Author : Stefan Dahlhoff
+% Date   : 30.12.2025
+% Mail   : stefan.dahlh@gmail.com
+
+%% Description:
+% This script analyzes DopaMeander activity during spontanoues
+% walking behavior.
+
+%% Dependecies:
+% Preprocessed data from walking_activity_preproessing.m
+% boxplot2.m
+% binning.m
+% binning_spikes.m
+% concatenate_analysis.m
+
+
 %% Load data and set file paths
 
 % Find current path and load data
@@ -302,22 +320,8 @@ zvelocbinned_all_mm = nan(length(analysis),max(temp_longest)+1);
 zvelocbinned_all_degree = nan(length(analysis),max(temp_longest)+1);
 
 
-
-% for i = [1,2,7,8,12]
-%     xvelocbinned_all(i,1:length(analysis(i).xvelocbinned)+1) = [analysis(i).xvelocbinned,0];
-%     spikesbinned_all(i,1:length(analysis(i).spikesbinned)+1) = [0,analysis(i).spikesbinned];
-% end
-%
-
 for k = 1 : length(analysis)
 
-    % spikesbinned_all(k,1:length(analysis(k).spikesbinned)+1) = [0,analysis(k).spikesbinned];
-    % xvelocbinned_all_mm(k,1:length(analysis(k).xveloc_in_mm_binned)+1) = ...
-    %     [analysis(k).xveloc_in_mm_binned,0];
-    % zvelocbinned_all_mm(k,1:length(analysis(k).zveloc_in_mm_binned)) = ...
-    %     [analysis(k).zveloc_in_mm_binned];
-    % zvelocbinned_all_degree(k,1:length(analysis(k).zveloc_in_degree_per_s_binned)) = ...
-    %     [analysis(k).zveloc_in_degree_per_s_binned];
     spikesbinned_all(k,1:length(analysis(k).spikesbinned)) = [analysis(k).spikesbinned];
     xvelocbinned_all_mm(k,1:length(analysis(k).xveloc_in_mm_binned)) = ...
         [analysis(k).xveloc_in_mm_binned];
@@ -329,16 +333,6 @@ for k = 1 : length(analysis)
 
 end
 
-% % %Pool Z scored data
-% % for k = 1 : length(analysis)
-% % 
-% %     spikesbinned_all_zscored(k,1:length((analysis(k).spikesbinned))+1) = [0,zscore(analysis(k).spikesbinned)];
-% %     xvelocbinned_all_mm_zscored(k,1:length((analysis(k).xveloc_in_mm_binned))+1) = ...
-% %         [zscore(analysis(k).xveloc_in_mm_binned),0];
-% %     zvelocbinned_all_mm_zscored(k,1:length(zscore(analysis(k).zveloc_in_mm_binned))) = ...
-% %         [zscore(analysis(k).zveloc_in_mm_binned)];
-% % 
-% % end
 %% Plot pooled data
 figure
 boxplot(xvelocbinned_all_mm(:), spikesbinned_all(:), 'symbol', '','whisker', 0)
@@ -358,15 +352,13 @@ figure
 swarmchart(spikesbinned_all(:), xvelocbinned_all_mm(:), '.')
 hold on
 yline(0, 'k--')
-%ylim([-1.2 1.2])
-% xlim([-1 set_xlim_swarm-1])
+
 
 figure
 plot(spikesbinned_all(:), xvelocbinned_all_mm(:), '.')
 hold on
 yline(0, 'k--')
-%ylim([-1.2 1.2])
-%xlim([-1 set_xlim_swarm-1])
+
 
 % print(['boxplots_frequencies' '.eps'], '-depsc2', '-tiff', '-r300', '-vector')
 % print(['boxplots_frequencies' '.png'], '-dpng','-r300', '-vector')

@@ -1,3 +1,17 @@
+%% MDNs receive bilateral antennal mechanosensory input to drive backward walking
+
+% Author : Stefan Dahlhoff
+% Date   : 30.12.2025
+% Mail   : stefan.dahlh@gmail.com
+
+%% Description:
+% This script analyses the effect of mechanical unilateral antennal
+% stimulation on walking behavior and MDN activity
+
+%% Dependecies:
+% Preprocessed data from walking_activity_preproessing.m
+% boxplot2.m
+
 %% Load data and set file paths
 
 %Find current path and load data
@@ -26,7 +40,6 @@ sampling_rate = 20000;
 
 binsize_factor = 0.2; %200 ms
 numPokes = 10;
-%t_ramp = 0.5; % 0.5s ramp time
 t_poke = 2; % 2s poke hold
 
 interstim_interval = 10; %10s between pokes
@@ -51,8 +64,7 @@ for k = 1 : length(analysis)
     analysis(k).motion = [analysis(k).VelocX, analysis(k).VelocY, analysis(k).VelocZ];
 end
 figure('Name', 'Trajectory')
-%tiledlayout(round(length(analysis)/4), 4)
-%tiledlayout(1,2)
+
 
 for k = 1 %: length(analysis)
 
@@ -231,8 +243,6 @@ clearvars binstart binstarts binsize
 binstarts = nan;
 binsize = binsize_factor*sampling_rate;
 
-%binned_zveloc_right = cell(1,length(analysis));
-
 for k = 1 : length(analysis)
 
     temp_zveloc = [];
@@ -249,11 +259,6 @@ for k = 1 : length(analysis)
             temp_zveloc_degree{m,bin} = sum(analysis(k).zveloc_in_degree_per_s(binstarts(bin):binstarts(bin+1)),'omitnan');
 
         end
-
-        % if to_be_removed_ID(k,m) == 1
-        %     temp_zveloc(k,m) = NaN;
-        % else
-        % end
 
 
 
@@ -272,7 +277,6 @@ clearvars binstart binstarts binsize
 binstarts = nan;
 binsize = binsize_factor*sampling_rate;
 
-%binned_zveloc_right = cell(1,length(analysis));
 
 for k = 1 : length(analysis)
 
@@ -289,10 +293,6 @@ for k = 1 : length(analysis)
             temp_medVM{m,bin} = sum(analysis(k). VM_medfilt(binstarts(bin):binstarts(bin+1)),'omitnan');
         end
 
-        % if to_be_removed_ID(k,m) == 1
-        %     temp_zveloc(k,m) = NaN;
-        % else
-        % end
 
     end
     analysis(k).binnedVM = cellfun(@(x)x/binsize, temp_VM);
@@ -362,11 +362,6 @@ end
 right_antenna = right_antenna(~cellfun(@isempty,{right_antenna.VM}));
 left_antenna = left_antenna(~cellfun(@isempty,{left_antenna.VM}));
 
-% right_antenna_currentInjection = right_antenna_currentInjection(~cellfun...
-%     (@isempty,{right_antenna_currentInjection.VM}));
-% left_antenna_currentInjection = left_antenna_currentInjection(~cellfun...
-%     (@isempty,{left_antenna_currentInjection.VM}));
-
 %save('postPoker_right_currentInjection','right_antenna_currentInjection','-v7.3');
 %save('postPoker_left_currentInjection','left_antenna_currentInjection','-v7.3');
 
@@ -384,12 +379,6 @@ left_antenna = left_antenna(~cellfun(@(x)x>25,{left_antenna.meanSpikeHz}));
 
 % save('postPoker_right','right_antenna','-v7.3');
 % save('postPoker_left','left_antenna','-v7.3');
-
-% right_antenna = right_antenna(~cellfun(@(x)x<5,{right_antenna.meanSpikeHz}));
-% left_antenna = left_antenna(~cellfun(@(x)x<5,{left_antenna.meanSpikeHz}));
-%
-% right_antenna = right_antenna(~cellfun(@(x)x>20,{right_antenna.meanSpikeHz}));
-% left_antenna = left_antenna(~cellfun(@(x)x>20,{left_antenna.meanSpikeHz}));
 
 numCells = length(right_antenna);
 
@@ -528,7 +517,6 @@ meanZvelocCellLeft = arrayfun(@(s) s.binnedZvelocDegreeMean, left_antenna, 'Unif
 meanZvelocOverallLeft = mean(cat(1, meanZvelocCellLeft{:}));
 
 
-%xbin = [1:bin]/(sampling_rate/binsize);
 xbin = ((binsize/2)/sampling_rate):binsize/sampling_rate:(bin*(binsize/sampling_rate));
 
 % Create a colormap
@@ -545,10 +533,8 @@ for i = 1 : length(right_antenna)
     hold on
 end
 plot(xbin, meanSpikerateOverallRight,'  k', 'Linewidth', 3)
-%rectangle('Position',[2 0 0.5 30], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 title('Spike rate')
 ylim([0 45])
-%rectangle('Position',[2 0 0.5 30], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 0 2 45], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 
 nexttile;
@@ -558,7 +544,6 @@ for i = 1 : length(left_antenna)
     hold on
 end
 plot(xbin, meanSpikerateOverallLeft, 'k','Linewidth', 2)
-%rectangle('Position',[2 0 0.5 30], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 0 2 45], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('Spike rate')
 ylim([0 45])
@@ -572,7 +557,6 @@ for i = 1 : length(right_antenna)
     hold on
 end
 plot(xbin, meanXvelocOverallRight, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2 2 3], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('X velocity')
 ylim([-2 1])
@@ -585,7 +569,6 @@ for i = 1 : length(left_antenna)
     hold on
 end
 plot(xbin, meanXvelocOverallLeft, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2 2 3], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('X velocity')
 ylim([-2 1])
@@ -598,7 +581,6 @@ for i = 1 : length(right_antenna)
     hold on
 end
 plot(xbin, meanZvelocOverallRight, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('Z velocity')
 % ylim([-2.5 2.5])
@@ -612,7 +594,6 @@ for i = 1 : length(right_antenna)
     hold on
 end
 plot(xbin, meanZvelocOverallLeft, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('Z velocity')
 % ylim([-2.5 2.5])
@@ -782,13 +763,7 @@ analysis_window = windowSizeinS * sampling_rate;
 
 for i = 1 : length(right_antenna)
     for k = 1 : numPokes
-        %
-        % if to_be_removed_ID{1}(i,k) == 1
-        %     spikesPrePokeRight{i}(k) = NaN;
-        %     spikesDuringPokeRight{i}(k) = NaN;
-        %     spikesPostPokeRight{i}(k) = NaN;
-        %     continue
-        % else
+        
         windowOnRight = right_antenna(i).trigger_on(k);
         windowOffRight = right_antenna(i).trigger_off(k);
         %Sum spikes pre poke
@@ -808,12 +783,6 @@ end
 for i = 1 : length(left_antenna)
     for k = 1 : numPokes
 
-        % if to_be_removed_ID{2}(i,k) == 1
-        %     spikesPrePokeLeft{i}(k) = NaN;
-        %     spikesDuringPokeLeft{i}(k) = NaN;
-        %     spikesPostPokeLeft{i}(k) = NaN;
-        %     continue
-        % else
         windowOnLeft = left_antenna(i).trigger_on(k);
         windowOffLeft = left_antenna(i).trigger_off(k);
         %Sum spikes pre poke
@@ -830,17 +799,11 @@ end
 % end
 
 %Calculate means of spikes
-% meanPreRight = cellfun(@mean, spikesPrePokeRight);
 meanPreRight = cellfun(@(x) mean(x, 'omitnan'), spikesPrePokeRight)
-%meanPreLeft = cellfun(@mean, spikesPrePokeLeft);
 meanPreLeft = cellfun(@(x) mean(x, 'omitnan'), spikesPrePokeLeft)
-% meanPokeRight = cellfun(@mean, spikesDuringPokeRight);
 meanPokeRight = cellfun(@(x) mean(x, 'omitnan'), spikesDuringPokeRight)
-% meanPokeLeft = cellfun(@mean, spikesDuringPokeLeft);
 meanPokeLeft = cellfun(@(x) mean(x, 'omitnan'), spikesDuringPokeLeft)
-% meanPostRight = cellfun(@mean, spikesPostPokeRight);
 meanPostRight = cellfun(@(x) mean(x, 'omitnan'), spikesPostPokeRight)
-% meanPostLeft = cellfun(@mean, spikesPostPokeLeft);
 meanPostLeft = cellfun(@(x) mean(x, 'omitnan'), spikesPostPokeLeft)
 
 %Statistics
@@ -880,8 +843,6 @@ medianFiringRateRightPre = h.med(1).YData(1)
 medianFiringRateRightPoke = h.med(2).YData(1)
 medianFiringRateRightPost = h.med(3).YData(1)
 
-% subtitle("Excluded trials: " + num2str(nExcludedRight)+"/"+ num2str(nTotalRight));
-
 nexttile
 title("LEFT" + newline + "N =" + num2str(length(right_antenna)))
 groupNames = ["Pre"; "Poke " + num2str(windowSizeinS) + "sec"; "Post"];
@@ -915,32 +876,14 @@ meanPostPooled = [meanPostLeft meanPostRight];
 [pWilPreVsPokePooled] = signrank(meanPrePooled, meanPokePooled);
 [pWilPostVsPokePooled] = signrank(meanPostPooled, meanPokePooled);
 
-% nexttile
-% title("Pooled" + newline + "N =" + num2str(length(meanPrePooled)))
-% groupNames = ["Pre"; "Poke 1st sec"; "Post"];
-% groups = [1; 2; 3;];
-% plot_y = [meanPrePooled; meanPokePooled; meanPostPooled];
-% h = boxplot2(plot_y',groups,'whisker', 0);
-% set(h.out, 'Marker', 'none')
-% xticks([1,2,3]);
-% xticklabels([groupNames]);
-% hold on
-% %Use scatter to plot filled circles of each mean
-% s = scatter(groups, plot_y);
-% set(s, 'Marker', {'none'});
-% line(groups, plot_y)
-% text(1,mean(meanPreLeft), ['p=' num2str(round(pWilPreVsPokePooled,4))])
-% text(3,mean(meanPostLeft), ['p=' num2str(round(pWilPostVsPokePooled,4))])
-% ylabel('Spike Rate (Hz)')
-% ylim([0 25])
 set(gcf,'position',[400, 100, 400,1000])
 
 %print median
 medianFiringRatePooledPre = h.med(1).YData(1);
 medianFiringRatePooledPoke = h.med(2).YData(1);
 medianFiringRatePooledPost = h.med(3).YData(1);
-% 
- % print(['spikerate_boxplot_500ms' '.eps'], '-depsc2', '-tiff', '-r300', '-vector')
+ 
+% print(['spikerate_boxplot_500ms' '.eps'], '-depsc2', '-tiff', '-r300', '-vector')
 % print(['spikerate_boxplot_500ms' '.png'], '-dpng','-r300', '-vector')
 
 
@@ -1090,13 +1033,6 @@ for i = 1 : numCells
         groupOne(1,i) = meanPokeRight(i);
     end
 end
-% figure
-% plot_y = [groupOne(1,:); groupTwo(1,:)];
-% groups = [1;2];
-% groupNames = ["1","2"];
-% boxplot2(plot_y',groups)
-% xticks([1,2]);
-% xticklabels(groupNames);
 
 hold on
 colors = 'mk';
@@ -1127,7 +1063,7 @@ xticks(1);
 ylabel("Contrast - Group 1 vs 2")
 ylim([0 1])
 
- % print(['Contrast_500ms' '.eps'], '-depsc2', '-tiff', '-r300', '-vector')
+% print(['Contrast_500ms' '.eps'], '-depsc2', '-tiff', '-r300', '-vector')
 % print(['Contrast_500ms' '.png'], '-dpng','-r300', '-vector')
 
 %% Calculate mean VM  and create boxplots
@@ -1139,12 +1075,6 @@ analysis_window = windowSizeinS * sampling_rate;
 for i = 1 : length(right_antenna)
     for k = 1 : numPokes
 
-        % if to_be_removed_ID{1}(i,k) == 1
-        %     medVMPrePokeRight{i}(k) = NaN;
-        %     medVMDuringPokeRight{i}(k) = NaN;
-        %     medVMPostPokeRight{i}(k) = NaN;
-        %     continue
-        % else
 
             windowOnRight = right_antenna(i).trigger_on(k);
             windowOffRight = right_antenna(i).trigger_off(k);
@@ -1158,19 +1088,12 @@ for i = 1 : length(right_antenna)
             medVMPostPokeRight{i}(k)  = mean(right_antenna(i).VM_medfilt...
                 (windowOffRight:windowOffRight+analysis_window),'omitnan');
 
-        end
     end
+end
 % end
 
 for i = 1 : length(left_antenna)
     for k = 1 : numPokes
-
-        % if to_be_removed_ID{2}(i,k) == 1
-        %     medVMPrePokeLeft{i}(k) = NaN;
-        %     medVMDuringPokeLeft{i}(k) = NaN;
-        %     medVMPostPokeLeft{i}(k) = NaN;
-        %     continue
-        % else
 
             windowOnLeft = left_antenna(i).trigger_on(k);
             windowOffLeft = left_antenna(i).trigger_off(k);
@@ -1183,22 +1106,16 @@ for i = 1 : length(left_antenna)
             %Sum spikes after poke
             medVMPostPokeLeft{i}(k)  = mean(left_antenna(i).VM_medfilt...
                 (windowOffLeft:windowOffLeft+analysis_window),'omitnan');
-        end
+       
     end
-% end
+end
 
 %Calculate means of X velocity
-% meanPreVMRight = cellfun(@mean, medVMPrePokeRight);
 meanPreVMRight = cellfun(@(x) mean(x, 'omitnan'), medVMPrePokeRight)
-% meanPokeVMRight = cellfun(@mean, medVMDuringPokeRight);
 meanPokeVMRight = cellfun(@(x) mean(x, 'omitnan'), medVMDuringPokeRight)
-% meanPostVMRight = cellfun(@mean, medVMPostPokeRight);
 meanPostVMRight = cellfun(@(x) mean(x, 'omitnan'), medVMPostPokeRight)
-% meanPreVMLeft = cellfun(@mean, medVMPrePokeLeft);
 meanPreVMLeft = cellfun(@(x) mean(x, 'omitnan'), medVMPrePokeLeft)
-% meanPokeVMLeft = cellfun(@mean, medVMDuringPokeLeft);
 meanPokeVMLeft = cellfun(@(x) mean(x, 'omitnan'), medVMDuringPokeLeft)
-% meanPostVMLeft = cellfun(@mean, medVMPostPokeLeft);
 meanPostVMLeft = cellfun(@(x) mean(x, 'omitnan'), medVMPostPokeLeft)
 
 %Statistics
@@ -1230,8 +1147,6 @@ text(1,-38.5, ['p=' num2str(pWilPreVsPokeVMRight)])
 text(3,-38.5, ['p=' num2str(pWilPostVsPokeVMRight)])
 ylabel('median VM (mV)')
 
-% subtitle("Excluded trials: " + num2str(nExcludedRight)+"/"+ num2str(nTotalRight));
-
 
 nexttile
 title("LEFT" + newline + "N =" + num2str(length(left_antenna)))
@@ -1249,8 +1164,6 @@ line(groups, plot_y)
 text(1,-38.5, ['p=' num2str(pWilPreVsPokeVMLeft)])
 text(3,-38.5, ['p=' num2str(pWilPostVsPokeVMLeft)])
 ylabel('median VM (mV)')
-
-% subtitle("Excluded trials: " + num2str(nExcludedLeft)+"/"+ num2str(nTotalLeft));
 
 
 %Pool data from right and left antenna
@@ -1296,13 +1209,6 @@ xVelocityPostPokeRight = [];
 for i = 1 : length(right_antenna)
     for k = 1 : numPokes
 
-        % if to_be_removed_ID{1}(i,k) == 1
-        %     xVelocityPrePokeRight{i}(k) = NaN;
-        %     xVelocityDuringPokeRight{i}(k) = NaN;
-        %     xVelocityPostPokeRight{i}(k) = NaN;
-        %     continue
-        % else
-
             windowOnRight = right_antenna(i).trigger_on(k);
             windowOffRight = right_antenna(i).trigger_off(k);
             %Sum spikes 1 s pre poke
@@ -1315,9 +1221,9 @@ for i = 1 : length(right_antenna)
             xVelocityPostPokeRight{i}(k)  = mean(right_antenna(i).xveloc_in_mm...
                 (windowOffRight:windowOffRight+analysis_window),'omitnan');
 
-        end
+   
     end
-% end
+end
 
 xVelocityPrePokeLeft = [];
 xVelocityDuringPokeLeft = [];
@@ -1325,13 +1231,6 @@ xVelocityPostPokeLeft = [];
 
 for i = 1 : length(left_antenna)
     for k = 1 : numPokes
-
-        % if to_be_removed_ID{2}(i,k) == 1
-        %     xVelocityPrePokeLeft{i}(k) = NaN;
-        %     xVelocityDuringPokeLeft{i}(k) = NaN;
-        %     xVelocityPostPokeLeft{i}(k) = NaN;
-        %     continue
-        % else
 
             windowOnLeft = left_antenna(i).trigger_on(k);
             windowOffLeft = left_antenna(i).trigger_off(k);
@@ -1344,22 +1243,16 @@ for i = 1 : length(left_antenna)
             %Sum spikes after poke
             xVelocityPostPokeLeft{i}(k)  = mean(left_antenna(i).xveloc_in_mm...
                 (windowOffLeft:windowOffLeft+analysis_window),'omitnan');
-        end
+       
     end
-% end
+end
 
 %Calculate means of X velocity
-% meanPreXRight = cellfun(@mean, xVelocityPrePokeRight);
 meanPreXRight = cellfun(@(x) mean(x, 'omitnan'), xVelocityPrePokeRight)
-% meanPokeXRight = cellfun(@mean, xVelocityDuringPokeRight);
 meanPokeXRight = cellfun(@(x) mean(x, 'omitnan'), xVelocityDuringPokeRight)
-% meanPostXRight = cellfun(@mean, xVelocityPostPokeRight);
 meanPostXRight = cellfun(@(x) mean(x, 'omitnan'), xVelocityPostPokeRight)
-% meanPreXLeft = cellfun(@mean, xVelocityPrePokeLeft);
 meanPreXLeft = cellfun(@(x) mean(x, 'omitnan'), xVelocityPrePokeLeft)
-% meanPokeXLeft = cellfun(@mean, xVelocityDuringPokeLeft);
 meanPokeXLeft = cellfun(@(x) mean(x, 'omitnan'), xVelocityDuringPokeLeft)
-% meanPostXLeft = cellfun(@mean, xVelocityPostPokeLeft);
 meanPostXLeft = cellfun(@(x) mean(x, 'omitnan'), xVelocityPostPokeLeft)
 
 %Statistics
@@ -1597,13 +1490,6 @@ analysis_window = windowSizeinSBehavior * sampling_rate;
 for i = 1 : length(right_antenna)
     for k = 1 : numPokes
 
-        % if to_be_removed_ID{1}(i,k) == 1
-        %     zVelocityPrePokeRight{i}(k) = NaN;
-        %     zVelocityDuringPokeRight{i}(k) = NaN;
-        %     zVelocityPostPokeRight{i}(k) = NaN;
-        %     continue
-        % else
-
             windowOnRight = right_antenna(i).trigger_on(k);
             windowOffRight = right_antenna(i).trigger_off(k);
             windowOnLeft = left_antenna(i).trigger_on(k);
@@ -1618,19 +1504,12 @@ for i = 1 : length(right_antenna)
             zVelocityPostPokeRight{i}(k)  = mean(right_antenna(i).zveloc_in_degree_per_s...
                 (windowOffRight:windowOffRight+analysis_window),'omitnan');
 
-        end
+     
     end
-% end
+end
 
 for i = 1 : length(left_antenna)
     for k = 1 : numPokes
-
-        % if to_be_removed_ID{2}(i,k) == 1
-        %     zVelocityPrePokeLeft{i}(k) = NaN;
-        %     zVelocityDuringPokeLeft{i}(k) = NaN;
-        %     zVelocityPostPokeLeft{i}(k) = NaN;
-        %     continue
-        % else
 
             windowOnLeft = left_antenna(i).trigger_on(k);
             windowOffLeft = left_antenna(i).trigger_off(k);
@@ -1644,22 +1523,16 @@ for i = 1 : length(left_antenna)
             zVelocityPostPokeLeft{i}(k)  = mean(left_antenna(i).zveloc_in_degree_per_s...
                 (windowOffLeft:windowOffLeft+analysis_window),'omitnan');
 
-        end
+       
     end
-% end
+end
 
 %Calculate means of Z velocity
-% meanPreZRight = cellfun(@mean, zVelocityPrePokeRight);
 meanPreZRight = cellfun(@(x) mean(x, 'omitnan'), zVelocityPrePokeRight);
-% meanPokeZRight = cellfun(@mean, zVelocityDuringPokeRight);
 meanPokeZRight = cellfun(@(x) mean(x, 'omitnan'), zVelocityDuringPokeRight);
-% meanPostZRight = cellfun(@mean, zVelocityPostPokeRight);
 meanPostZRight = cellfun(@(x) mean(x, 'omitnan'), zVelocityPostPokeRight);
-% meanPreZLeft = cellfun(@mean, zVelocityPrePokeLeft);
 meanPreZLeft = cellfun(@(x) mean(x, 'omitnan'), zVelocityPrePokeLeft);
-% meanPokeZLeft = cellfun(@mean, zVelocityDuringPokeLeft);
 meanPokeZLeft = cellfun(@(x) mean(x, 'omitnan'), zVelocityDuringPokeLeft);
-% meanPostZLeft = cellfun(@mean, zVelocityPostPokeLeft);
 meanPostZLeft = cellfun(@(x) mean(x, 'omitnan'), zVelocityPostPokeLeft);
 
 %Statistics
@@ -1697,8 +1570,6 @@ medianZVelocityRightPre = h.med(1).YData(1)
 medianZVelocityRightPoke = h.med(2).YData(1)
 medianZVelocityRightPost = h.med(3).YData(1)
 
-% subtitle("Excluded trials: " + num2str(nExcludedRight)+"/"+ num2str(nTotalRight));
-
 
 nexttile
 title("LEFT" + newline + "N =" + num2str(length(left_antenna)))
@@ -1723,8 +1594,6 @@ medianZVelocityLeftPre = h.med(1).YData(1)
 medianZVelocityLeftPoke = h.med(2).YData(1)
 medianZVelocityLeftPost = h.med(3).YData(1)
 
-% subtitle("Excluded trials: " + num2str(nExcludedRight)+"/"+ num2str(nTotalRight));
-
 %-----------------------------------------------------
 %---------RIGHT ANTENNA IS MIRRORED -> *(-1)----------
 %-----------------------------------------------------
@@ -1733,10 +1602,6 @@ medianZVelocityLeftPost = h.med(3).YData(1)
 meanPreZPooled = [meanPreZLeft meanPreZRight*(-1)];
 meanPokeZPooled = [meanPokeZLeft meanPokeZRight*(-1)];
 meanPostZPooled = [meanPostZLeft meanPostZRight*(-1)];
-
-% meanPreZPooled = [meanPreZLeft abs(meanPreZRight)];
-% meanPokeZPooled = [meanPokeZLeft abs(meanPokeZRight)];
-% meanPostZPooled = [meanPostZLeft abs(meanPostZRight)];
 
 [pWilPreVsPokeZPooled] = signrank(meanPreZPooled, meanPokeZPooled);
 [pWilPostVsPokeZPooled] = signrank(meanPostZPooled, meanPokeZPooled);
@@ -2021,24 +1886,6 @@ StimAnalysisMeanZvelocLeft = cellfun(@(x) mean(x, 'all', 'omitnan'), StimAnalysi
 StimAnalysisMaxZvelocLeft = cellfun(@(x) max(x), StimAnalysisXvelocLeft);
 
 
-%Create a colormap with 10 different colors
-% colors = [
-%     0.8500 0.3250 0.0980;   % Reddish-Orange
-%     0.9290 0.6940 0.1250;   % Yellow
-%     0.4940 0.1840 0.5560;   % Purple
-%     0.4660 0.6740 0.1880;   % Green
-%     0.3010 0.7450 0.9330;   % Light Blue
-%     0.6350 0.0780 0.1840;   % Dark Red
-%     0.0000 0.4470 0.7410;   % Blue
-%     0.8500 0.3250 0.0980;   % Reddish-Orange (again)
-%     0.4940 0.1840 0.5560;   % Purple (again)
-%     0.9290 0.6940 0.1250;   % Yellow (again)
-% ];
-%
-% colormap(colors);
-% cmap = colormap;
-
-
 %Scatter plot of Firing rate vs X velocity
 figure
 for n = 1 : numCells
@@ -2237,14 +2084,6 @@ for n = 1 : numCells
         scatter(beforeStimSpikeXHz(n,i), StimAnalysisMinXvelocRight(n,i),50 ,...
             'filled', 'jitter','on', 'jitterAmount',0.25)
         hold on
-        %
-        %         scatter(StimAnalysisSumSpikesRight(n,i), StimAnalysisMeanXvelocRight(n,i),50 ,...
-        %             'jitter','on', 'jitterAmount',0.25)
-        %         hold on
-        %
-        %         scatter(StimAnalysisSumSpikesRight(n,i), StimAnalysisMinXvelocRight(n,i),50 ,...
-        %             's', 'jitter','on', 'jitterAmount',0.25)
-        %
         xlabel('MDN Firing Rate (Hz)')
         ylabel('X Velocity mm/s')
     end
@@ -2267,14 +2106,6 @@ for n = 1 : numCells
         scatter(beforeStimSpikeZHz(n,i), StimAnalysisMinZvelocRight(n,i),50 ,...
             'filled', 'jitter','on', 'jitterAmount',0.25)
         hold on
-        %
-        %         scatter(StimAnalysisSumSpikesRight(n,i), StimAnalysisMeanXvelocRight(n,i),50 ,...
-        %             'jitter','on', 'jitterAmount',0.25)
-        %         hold on
-        %
-        %         scatter(StimAnalysisSumSpikesRight(n,i), StimAnalysisMinXvelocRight(n,i),50 ,...
-        %             's', 'jitter','on', 'jitterAmount',0.25)
-        %
         xlabel('MDN Firing Rate (Hz)')
         ylabel('Z Velocity mm/s')
     end
@@ -2349,14 +2180,7 @@ for n = 1 : numCells
         scatter(beforeStimSpikeXHz(n,i), StimAnalysisMinXvelocLeft(n,i),50 ,...
             'filled', 'jitter','on', 'jitterAmount',0.25)
         hold on
-        %
-        %         scatter(StimAnalysisSumSpikesRight(n,i), StimAnalysisMeanXvelocRight(n,i),50 ,...
-        %             'jitter','on', 'jitterAmount',0.25)
-        %         hold on
-        %
-        %         scatter(StimAnalysisSumSpikesRight(n,i), StimAnalysisMinXvelocRight(n,i),50 ,...
-        %             's', 'jitter','on', 'jitterAmount',0.25)
-        %
+
         xlabel('MDN Firing Rate (Hz)')
         ylabel('X Velocity mm/s')
     end
@@ -2373,14 +2197,7 @@ for n = 1 : numCells
         scatter(beforeStimSpikeZHz(n,i), StimAnalysisMaxZvelocLeft(n,i),50 ,...
             'filled', 'jitter','on', 'jitterAmount',0.25)
         hold on
-        %
-        %         scatter(StimAnalysisSumSpikesRight(n,i), StimAnalysisMeanXvelocRight(n,i),50 ,...
-        %             'jitter','on', 'jitterAmount',0.25)
-        %         hold on
-        %
-        %         scatter(StimAnalysisSumSpikesRight(n,i), StimAnalysisMinXvelocRight(n,i),50 ,...
-        %             's', 'jitter','on', 'jitterAmount',0.25)
-        %
+
         xlabel('MDN Firing Rate (Hz)')
         ylabel('Z Velocity mm/s')
     end

@@ -1,3 +1,18 @@
+% Preprocessing of walking related data
+
+% Author: Stefan Dahlhoff
+% Date   : 30.12.2025
+% Mail   : stefan.dahlh@gmail.com
+
+%% Description:
+% This script detects spikes and combines data for further analysis.
+
+%% Dependecies:
+% abfload_modified.m
+% fcn_Excelimport.m
+% spikedetector.m
+
+
 %% Load abf files and set parameters
 filepath='path';
 cd(filepath)
@@ -37,7 +52,7 @@ for fly = 1:length(files)
 
     file=num2str(files(fly).name(1:end-4)); % File name without '.abf' (-4 characters)
 
-    [d1,h_1] = abfload_Sander(strcat(filepath, file, '.abf'));
+    [d1,h_1] = abfload_modified(strcat(filepath, file, '.abf'));
 
     sampling_rate = 1/(h_1.si/1000000); %Sampling Rate in Hz from ABF FIle(stored as microseconds)
 
@@ -76,28 +91,6 @@ for fly = 1:length(files)
 
     x = (1:length(VM)) / sampling_rate;
 
-%     %% Truncate data
-%     raw_data_fig = figure;
-%     plot(VM)
-%     set(raw_data_fig, 'position', [1, 600, 1900, 450]);
-% 
-%     truncate_data = questdlg('Do you want to truncate data?','Truncate data?','Yes','No', 'No');
-% 
-%     if strcmpi (truncate_data, 'Yes')
-%         cutofffig = figure;
-%         set(cutofffig, 'position', [1, 600, 1900, 450]);
-%         cutoff = ginput(1);
-%         close (gcf);
-% 
-%         VM = VM(1:floor(cutoff(1)));
-%         Wingbeat = Wingbeat(1:floor(cutoff(1)));
-%         VelocX = VelocX(1:floor(cutoff(1)));
-%         VelocY = VelocY(1:floor(cutoff(1)));
-%         VelocZ = VelocZ(1:floor(cutoff(1)));
-%         LED = LED(1:floor(cutoff(1)));
-%     else
-%         close(gcf);
-%     end
 
     %% Smooth VM
 

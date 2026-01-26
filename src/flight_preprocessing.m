@@ -1,15 +1,22 @@
-%==========================================================================
-% File Name: flight_preprocessing.m
-%
-% Description:
-%   Detect flight bouts and save spike rates, membrane potential etc.
-%
-% Original Author:
-%   Sander Ließem (Neurobiology and Genetics, Julius-Maximilians-University
-%   of Würzburg)
-%
-% Notes:
+%% MDN and DopaMeander are gated out during flight. 
+
+% Original Author: Sander Ließem (Neurobiology and Genetics, 
+% Julius-Maximilians-University of Würzburg)
+% Modified by Stefan Dahlhoff
+% Date   : 30.12.2025
+% Mail   : stefan.dahlh@gmail.com
+
+%% Notes:
 %   Used and modified with permission.
+
+%% Description:
+% This script detects flight bouts and saves spike rates, membrane potential etc.
+
+%% Dependecies:
+% abfload_modified.m
+% fcn_Excelimport.m
+% spikedetector.m
+
 
 %% Cleaning up and defining workspace
 clear all
@@ -164,7 +171,7 @@ for fly=1:length(files)
     
     if skip_file == 0
     file=num2str(files(fly).name(1:end-4)); % File name without '.abf'
-    [d1,h_1]=abfload_Sander(strcat(filepath, file, '.abf'));
+    [d1,h_1]=abfload_modified(strcat(filepath, file, '.abf'));
     sampling_rate = 1/(h_1.si/1000000); %Sampling Rate in Hz from ABF FIle(stored as microseconds)
     
     if retrieve_results_prev_analysis == 1 && strcmp(files(fly).name(1:15), files_aready_analysed(fly).name(1:15)) %In case file has already been analysed and we want to retrieve flight treshold and trunctimes

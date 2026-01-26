@@ -1,3 +1,17 @@
+%% Silencing MDN reduces antennal stimulation induced backward walking
+
+% Author : Stefan Dahlhoff
+% Date   : 30.12.2025
+% Mail   : stefan.dahlh@gmail.com
+
+%% Description:
+% This script analyses the effect of mechanical unilateral antennal
+% stimulation on walking behavior in MDN-silenced and control flies
+
+%% Dependecies:
+% Preprocessed data from walking_activity_preproessing.m
+% boxplot2.m
+
 %% Load data and set file paths
 
 %Find current path and load data
@@ -46,8 +60,6 @@ for k = 1 : length(analysis)
     analysis(k).motion = [analysis(k).VelocX, analysis(k).VelocY, analysis(k).VelocZ];
 end
 figure('Name', 'Trajectory')
-%tiledlayout(round(length(analysis)/4), 4)
-%tiledlayout(1,2)
 
 for k = 1 : length(analysis)
 
@@ -71,13 +83,7 @@ for k = 1 : length(analysis)
     z = zeros(size(x));
 
     scatter(x(1), yleft(1), [3000], '.')
-
-    %c = analysis(i).spikesnorm_binned;
-
     scatter(x(1:end-2), yleft(1:end-2), [], 'c',  'filled', 'o');
-
-
-    %scatter(x(1:end-2), y(1:end-2), [], 'filled', 'o');
 
     colormap(flipud(cool))
     colorbar;
@@ -109,8 +115,6 @@ clearvars binstart binstarts binsize binned_xveloc_right
 binstarts = nan;
 binsize = binsize_factor*sampling_rate;
 
-%binned_xveloc_right = cell(1,length(analysis));
-
 for k = 1 : length(analysis)
 
     temp_xveloc = [];
@@ -137,8 +141,6 @@ clearvars binstart binstarts binsize
 
 binstarts = nan;
 binsize = binsize_factor*sampling_rate;
-
-%binned_zveloc_right = cell(1,length(analysis));
 
 for k = 1 : length(analysis)
 
@@ -240,7 +242,6 @@ for i = 1 : length(right_antenna_control)
     hold on
 end
 plot(xbin, meanXvelocOverallControlLeft, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2 2 3], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('X velocity LEFT')
 ylim([-2 1])
@@ -253,7 +254,6 @@ for i = 1 : length(right_antenna_control)
     hold on
 end
 plot(xbin, meanXvelocOverallControlRight, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2 2 3], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('X velocity RIGHT')
 ylim([-2 1])
@@ -266,7 +266,6 @@ for i = 1 : length(right_antenna_control)
     hold on
 end
 plot(xbin, meanZvelocOverallControlLeft, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('Z velocity LEFT')
 ylim([-2.5 2.5])
@@ -280,7 +279,6 @@ for i = 1 : length(right_antenna_control)
     hold on
 end
 plot(xbin, meanZvelocOverallControlRight, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('Z velocity RIGHT')
 ylim([-2.5 2.5])
@@ -299,12 +297,6 @@ stdev_left = std(cat(1, meanXvelocCellControlLeft{:}));
 stderror_left = stdev_left/sqrt(length(cat(1, meanXvelocCellControlLeft{:})));
 stdev_right = std(cat(1, meanXvelocCellControlRight{:}));
 stderror_right = stdev_right/sqrt(length(cat(1, meanXvelocCellControlRight{:})));
-
-% %Add SEM to y upper and limit and subtract from lower limit
-% y_upper_limit_X_Control_Left = meanXvelocOverallControlLeft + stderror_left;
-% y_lower_limit_X_Control_Left = meanXvelocOverallControlLeft - stderror_left;
-% y_upper_limit_X_Control_Right = meanXvelocOverallControlRight + stderror_right;
-% y_lower_limit_X_Control_Right = meanXvelocOverallControlRight - stderror_right;
 
 %Add SD to y upper and limit and subtract from lower limit
 y_upper_limit_X_Control_Left = meanXvelocOverallControlLeft + stdev_left;
@@ -340,13 +332,6 @@ stdev_left = std(cat(1, meanZvelocCellControlLeft{:}));
 stderror_left = stdev_left/sqrt(length(cat(1, meanZvelocCellControlLeft{:})));
 stdev_right = std(cat(1, meanZvelocCellControlRight{:}));
 stderror_right = stdev_right/sqrt(length(cat(1, meanZvelocCellControlRight{:})));
-
-%
-% %Add SEM to y upper and limit and subtract from lower limit
-% y_upper_limit_Z_Control_Left = meanZvelocOverallControlLeft + stderror_left;
-% y_lower_limit_Z_Control_Left = meanZvelocOverallControlLeft - stderror_left;
-% y_upper_limit_Z_Control_Right = meanZvelocOverallControlRight + stderror_right;
-% y_lower_limit_Z_Control_Right = meanZvelocOverallControlRight - stderror_right;
 
 %Add error to y upper and limit and subtract from lower limit
 y_upper_limit_Z_Control_Left = meanZvelocOverallControlLeft + stdev_left;
@@ -418,7 +403,6 @@ meanZvelocOverallKirRight = mean(cat(1, meanZvelocCellKirRight{:}));
 meanZvelocCellKirLeft = arrayfun(@(s) s.binnedZvelocMean, left_antenna_kir, 'UniformOutput', false);
 meanZvelocOverallKirLeft = mean(cat(1, meanZvelocCellKirLeft{:}));
 
-%xbin = [1:bin]/(sampling_rate/binsize);
 xbin = ((binsize/2)/sampling_rate):binsize/sampling_rate:(bin*(binsize/sampling_rate));
 
 % Create a colormap
@@ -436,7 +420,6 @@ for i = 1 : length(left_antenna_kir)
     hold on
 end
 plot(xbin, meanXvelocOverallKirLeft, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2 2 3], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('X velocity LEFT')
 ylim([-2 1])
@@ -449,7 +432,6 @@ for i = 1 : length(right_antenna_kir)
     hold on
 end
 plot(xbin, meanZvelocOverallKirRight, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('Z velocity RIGHT')
 ylim([-2.5 2.5])
@@ -463,7 +445,6 @@ for i = 1 : length(right_antenna_kir)
     hold on
 end
 plot(xbin, meanZvelocOverallKirLeft, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('Z velocity LEFT')
 ylim([-2.5 2.5])
@@ -476,7 +457,6 @@ for i = 1 : length(right_antenna_kir)
     hold on
 end
 plot(xbin, meanXvelocOverallKirRight, 'k','Linewidth', 3)
-%rectangle('Position',[2 -1 0.5 3], 'FaceColor', [1 0 1 0.15], 'EdgeColor', 'w')
 rectangle('Position',[1 -2 2 3], 'FaceColor', [0 0 1 0.15], 'EdgeColor', 'w')
 title('X velocity RIGHT')
 ylim([-2 1])
@@ -493,12 +473,6 @@ stdev_left = std(cat(1, meanXvelocCellKirLeft{:}));
 stderror_left = stdev_left/sqrt(length(cat(1, meanXvelocCellKirLeft{:})));
 stdev_right = std(cat(1, meanXvelocCellKirRight{:}));
 stderror_right = stdev_right/sqrt(length(cat(1, meanXvelocCellKirRight{:})));
-
-% %Add error to y upper and limit and subtract from lower limit
-% y_upper_limit_X_Kir_Left = meanXvelocOverallKirLeft + stderror_left;
-% y_lower_limit_X_Kir_Left = meanXvelocOverallKirLeft - stderror_left;
-% y_upper_limit_X_Kir_Right = meanXvelocOverallKirRight + stderror_right;
-% y_lower_limit_X_Kir_Right = meanXvelocOverallKirRight - stderror_right;
 
 %Add error to y upper and limit and subtract from lower limit
 y_upper_limit_X_Kir_Left = meanXvelocOverallKirLeft + stdev_left;
@@ -530,12 +504,6 @@ stdev_left = std(cat(1, meanZvelocCellKirLeft{:}));
 stderror_left = stdev_left/sqrt(length(cat(1, meanZvelocCellKirLeft{:})));
 stdev_right = std(cat(1, meanZvelocCellKirRight{:}));
 stderror_right = stdev_right/sqrt(length(cat(1, meanZvelocCellKirRight{:})));
-
-% %Add error to y upper and limit and subtract from lower limit
-% y_upper_limit_Z_Kir_Left = meanZvelocOverallKirLeft + stderror_left;
-% y_lower_limit_Z_Kir_Left = meanZvelocOverallKirLeft - stderror_left;
-% y_upper_limit_Z_Kir_Right = meanZvelocOverallKirRight + stderror_right;
-% y_lower_limit_Z_Kir_Right = meanZvelocOverallKirRight - stderror_right;
 
 %Add error to y upper and limit and subtract from lower limit
 y_upper_limit_Z_Kir_Left = meanZvelocOverallKirLeft + stdev_left;
@@ -599,30 +567,25 @@ figure('name', 'CONTROL vs SILENCED')
 tiledlayout(2,2)
 
 nexttile;
-% fill([xbin fliplr(xbin)], [y_upper_limit_X_Control_Left fliplr(y_lower_limit_X_Control_Left)],...
-% [1 0 0], 'FaceAlpha', 0.2, 'linestyle', 'none')
+
 hold all
 plot(xbin, meanXvelocOverallControlLeft, 'LineWidth',3)
-% fill([xbin fliplr(xbin)], [y_upper_limit_X_Kir_Left fliplr(y_lower_limit_X_Kir_Left)],...
-% [1 0 0], 'FaceAlpha', 0.2, 'linestyle', 'none')
+
 hold all
 plot(xbin, meanXvelocOverallKirLeft, 'LineWidth',3)
 
 title('LEFT')
 ylabel('X Velocity (mm))');
 yline(0,'--');
-% legend('', 'control +- SD', '', 'silenced +- SD','Location','southeast','FontSize',12)
 legend('control', 'silenced','Location','southeast','FontSize',12)
 rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0.7 0.7 0.7 0.3], 'EdgeColor', 'w')
 ylim([-1 0.5])
 
 nexttile;
-% fill([xbin fliplr(xbin)], [y_upper_limit_X_Control_Right fliplr(y_lower_limit_X_Control_Right)],...
-% [1 0 0], 'FaceAlpha', 0.2, 'linestyle', 'none')
+
 hold all
 plot(xbin, meanXvelocOverallControlRight, 'LineWidth',3)
-% fill([xbin fliplr(xbin)], [y_upper_limit_X_Kir_Right fliplr(y_lower_limit_X_Kir_Right)],...
-% [1 0 0], 'FaceAlpha', 0.2, 'linestyle', 'none')
+
 hold all
 plot(xbin, meanXvelocOverallKirRight, 'LineWidth',3)
 title('RIGHT')
@@ -632,12 +595,10 @@ rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0.7 0.7 0.7 0.3], 'EdgeColor', 
 ylim([-1 0.5])
 
 nexttile
-% fill([xbin fliplr(xbin)], [y_upper_limit_Z_Control_Left fliplr(y_lower_limit_Z_Control_Left)],...
-% [1 0 0], 'FaceAlpha', 0.2, 'linestyle', 'none')
+
 hold all
 plot(xbin, meanZvelocOverallControlLeft, 'LineWidth',3)
-% fill([xbin fliplr(xbin)], [y_upper_limit_Z_Kir_Left fliplr(y_lower_limit_Z_Kir_Left)],...
-% [1 0 0], 'FaceAlpha', 0.2, 'linestyle', 'none')
+
 hold all
 plot(xbin, meanZvelocOverallKirLeft, 'LineWidth',3)
 
@@ -647,12 +608,10 @@ rectangle('Position',[1 -2.5 2 5], 'FaceColor', [0.7 0.7 0.7 0.3], 'EdgeColor', 
 ylim([-1 1])
 
 nexttile
-% fill([xbin fliplr(xbin)], [y_upper_limit_Z_Control_Right fliplr(y_lower_limit_Z_Control_Right)],...
-% [1 0 0], 'FaceAlpha', 0.2, 'linestyle', 'none')
+
 hold all
 plot(xbin, meanZvelocOverallControlRight, 'LineWidth',3)
-% fill([xbin fliplr(xbin)], [y_upper_limit_Z_Kir_Right fliplr(y_lower_limit_Z_Kir_Right)],...
-% [1 0 0], 'FaceAlpha', 0.2, 'linestyle', 'none')
+
 hold all
 plot(xbin, meanZvelocOverallKirRight, 'LineWidth',3)
 ylabel('Z Velocity (mm))');
@@ -729,17 +688,6 @@ for i = 1 : length(right_antenna_control)
 
     %Plot Min X velocity of right and left antenna in one group per fly number
     plot_y = [MeanXvelocLeft(i,:)', MeanXvelocRight(i,:)'];
-
-    % %save median of right and left x velocity per fly
-    % med(i,:) = median(plot_y);
-    % med_absolute = abs(med);
-    % difference_left_right = abs(med_absolute(:,1) - med_absolute(:,2));
-    %
-    % %if difference in median between righ and left is larger than X dont plot
-    %  if difference_left_right(i) > 0.5
-    %      continue
-    %  else
-    %  end
 
     hbox{k} = boxplot2(plot_y, groups(i),'whisker', 0);
 
@@ -867,17 +815,6 @@ for i = 1 : length(right_antenna_kir)
 
     %Plot Min X velocity of right and left antenna in one group per fly number
     plot_y = [MinXvelocSilencedLeft(i,:)', MinXvelocSilencedRight(i,:)'];
-
-    % %save median of right and left x velocity per fly
-    % med(i,:) = median(plot_y);
-    % med_absolute = abs(med);
-    % difference_left_right = abs(med_absolute(:,1) - med_absolute(:,2));
-    %
-    % %if difference in median between righ and left is larger than X dont plot
-    %  if difference_left_right(i) > 0.5
-    %      continue
-    %  else
-    %  end
 
     hbox{k} = boxplot2(plot_y, groups(i),'whisker', 0);
 

@@ -1,15 +1,21 @@
-%==========================================================================
-% File Name: flight_analysis.m
-%
-% Description:
-%   Analyse flight bouts detected during preprocessing
-%
-% Original Author:
-%   Sander Ließem (Neurobiology and Genetics, Julius-Maximilians-University
-%   of Würzburg)
-%
-% Notes:
+%% Preprocessing of flight related data
+
+% Original Author: Sander Ließem (Neurobiology and Genetics, 
+% Julius-Maximilians-University of Würzburg)
+% Modified by Stefan Dahlhoff
+% Date   : 30.12.2025
+% Mail   : stefan.dahlh@gmail.com
+
+%% Notes:
 %   Used and modified with permission.
+
+%% Description:
+% This script detects flight bouts, spikes and combines data for further
+% analysis
+
+%% Dependecies:
+% Preprocessed data from flight_preproessing.m
+% boxplot2.m
 
 %% Cleaning up and defining workspace
 clear all

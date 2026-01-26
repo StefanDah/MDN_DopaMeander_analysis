@@ -1,3 +1,20 @@
+%% DopaMeander and MDN differentially contribute to backward walking, forward walking, and turning.
+
+% Author : Stefan Dahlhoff
+% Date   : 30.12.2025
+% Mail   : stefan.dahlh@gmail.com
+
+%% Description:
+% This script analyzes MDN activity during spontanoues
+% walking behavior.
+
+%% Dependecies:
+% Preprocessed data from walking_activity_preproessing.m
+% boxplot2.m
+% binning.m
+% binning_spikes.m
+% concatenate_analysis.m
+
 %% Load data and set file paths
 
 % Find current path and load data
